@@ -3,6 +3,7 @@ from cuentas import Cuentas
 from movimientos import Movimientos
 from poo.lib import Datos
 import pickle
+import os
 
 
 class Clientes:
@@ -37,9 +38,18 @@ class Clientes:
         obm = Movimientos()
         ncl = self.__no_cliente()
         obc.nuevo(ncl)
+
+        # Guardar cliente
         with open(self.__ac, 'ab') as oba:
             pickle.dump(obc, oba)
+
+        # Crear cuenta inicial
         nc = obd.nueva(ncl)
+
+        # Actualizar contador de cuentas del cliente
+        self.actualizar_contador_cuentas(ncl, 1)
+
+        # Crear movimiento inicial
         obm.nuevo(nc)
 
     def lista(self):
@@ -61,10 +71,9 @@ class Clientes:
             print('No hay clientes registrados...')
 
     def cliente_ncl(self):
-        ban = True
         try:
             ncl = Datos().entero('Número de cliente')
-            with open(self.__acl, 'rb') as oba:
+            with open(self.__ac, 'rb') as oba:
                 try:
                     while True:
                         obc = pickle.load(oba)
@@ -76,11 +85,11 @@ class Clientes:
                                 print('Cliente inactivo')
                                 return 0
                 except EOFError:
-                    if ban:
-                        print('No hay clientes registrados con ese numero...')
-                        return 0
+                    print('No hay clientes registrados con ese numero...')
+                    return 0
         except FileNotFoundError:
             print('No hay clientes registrados...')
+            return 0
 
     def buscar(self):
         ban = True
@@ -98,12 +107,13 @@ class Clientes:
                                 obd.títulos()
                                 obd.mostrar()
                                 lista = obc.buscar_ncl(ncl)
-                                for i in lista:
-                                    print("<<CUENTAS>>")
-                                    i.títulos()
-                                    i.mostrar()
-                                    print("<<MOVIMIENTOS>>")
-                                    obm.mostrar(i.nc())
+                                if lista:
+                                    for i in lista:
+                                        print("<<CUENTAS>>")
+                                        i.títulos()
+                                        i.mostrar()
+                                        print("<<MOVIMIENTOS>>")
+                                        obm.mostrar(i.nc())
                                 ban = False
                 except EOFError:
                     if ban:
@@ -121,11 +131,9 @@ class Clientes:
                         obc = pickle.load(oba)
                         if obc.ncl() == ncl:
                             if obc.act():
-                                obc.títulos()
                                 ban = False
-                                obc.mostrar()
                                 obc.modificar()
-                            pickle.dump(obc, obx)
+                        pickle.dump(obc, obx)
                 except EOFError:
                     if ban:
                         print('No se ha encontrado el cliente.')
@@ -147,19 +155,27 @@ class Clientes:
                         ncl = obd.ncl()
                         if obd.act() and ncl == ncl_b:
                             lista = cuentas.buscar_ncl(ncl)
-                            if not lista:
+                            # Verificar que todas las cuentas estén inactivas
+                            cuentas_activas = False
+                            if lista:
+                                for cuenta in lista:
+                                    if cuenta.act():
+                                        cuentas_activas = True
+                                        break
+
+                            if not cuentas_activas:
                                 obd.inactivo()
                                 print(f"Se ha eliminado el cliente correctamente")
-                                ban = False
                             else:
                                 print(
-                                    f"No se puede eliminar el cliente {ncl} porque tiene cuentas asociadas.")
+                                    f"No se puede eliminar el cliente {ncl} porque tiene cuentas activas.")
+                            ban = False
                         pickle.dump(obd, obx)
                 except EOFError:
                     pass
             if not ban:
                 self.__actualizar()
-            else:
+            elif ban:
                 print('No se ha encontrado el cliente o ya está inactivo.')
         except FileNotFoundError:
             print('No hay clientes registrados...')
@@ -200,3 +216,22 @@ class Clientes:
                         print('No hay clientes inactivos...')
         except FileNotFoundError:
             print('No hay clientes registrados...')
+
+    def actualizar_contador_cuentas(self, ncl, incremento):
+        """Actualiza el contador de cuentas de un cliente"""
+        try:
+            with open(self.__ac, 'rb') as oba, open(self.__aa, 'wb') as obx:
+                try:
+                    while True:
+                        obc = pickle.load(oba)
+                        if obc.ncl() == ncl:
+                            if incremento > 0:
+                                obc.incrementar_cuentas()
+                            else:
+                                obc.decrementar_cuentas()
+                        pickle.dump(obc, obx)
+                except EOFError:
+                    pass
+            self.__actualizar()
+        except FileNotFoundError:
+            pass

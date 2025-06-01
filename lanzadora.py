@@ -61,7 +61,7 @@ class Lanzadora:
     def sexo(self):
         sexo = ['M', 'F']
         while True:
-            self.__sexo = self.obd.caracter("Sexo (M/F)").upper()
+            self.__sexo = self.obd.carácter("Sexo (M/F)").upper()
             if self.__sexo in sexo:
                 break
         return self.__sexo

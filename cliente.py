@@ -72,3 +72,13 @@ class Cliente:
 
     def activo(self):
         self.__act = 1
+
+    def incrementar_cuentas(self):
+        self.__cc += 1
+
+    def decrementar_cuentas(self):
+        if self.__cc > 0:
+            self.__cc -= 1
+
+    def cantidad_cuentas(self):
+        return self.__cc

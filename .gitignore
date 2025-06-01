@@ -1,1 +1,5 @@
 __pycache__
+auxiliar_*.txt
+clientes.txt
+cuentas.txt
+movimientos.txt

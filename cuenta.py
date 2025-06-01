@@ -22,11 +22,11 @@ class Cuenta:
 
     def títulos(self):
         obf = Formato()
-        print(f"| {obf.izq('NO.', 3)} | {obf.cen('NOMBRE', 30)} | {obf.der('SUC', 3)} | {obf.izq('FEC. AP.', 12)} | {obf.der('SALDO', 15)} | {obf.cen('ESTADO', 10)}")
+        print(f"| {obf.izq('NO.', 3)} | {obf.cen('NOMBRE', 30)} | {obf.der('SUC', 3)} | {obf.izq('FEC. AP.', 12)} | {obf.der('SALDO', 15)} | {obf.cen('ESTADO', 10)} | {obf.izq('NCL', 3)} |")
 
     def mostrar(self):
         obf = Formato()
-        print(f"| {obf.izq(self.__nc, 3)} | {obf.cen(self.__nm, 30)} | {obf.der(self.__suc, 3)} | {obf.izq(self.__fa, 12)} | {obf.der(self.__sal, 15)} | {obf.cen('ACTIVO' if self.__act else 'INACTIVO', 10)}")
+        print(f"| {obf.izq(self.__nc, 3)} | {obf.cen(self.__nm, 30)} | {obf.der(self.__suc, 3)} | {obf.izq(self.__fa, 12)} | {obf.der(self.__sal, 15)} | {obf.cen('ACTIVO' if self.__act else 'INACTIVO', 10)} | {obf.izq(self.__ncl, 3)} |")
 
     def saldo(self, mon, tip):
         sal = self.__sal
@@ -36,7 +36,7 @@ class Cuenta:
         if sal == 0:
             self.__act = 0
             self.__sal = sal
-            return 0, 0
+            return 1, 0
         elif sal < 0:
             print('No se realizo la operación')
             self.__sal = 0

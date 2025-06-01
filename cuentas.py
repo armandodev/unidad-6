@@ -6,8 +6,7 @@ import pickle
 class Cuentas:
     def __init__(self):
         self.__ac = 'cuentas.txt'
-        self.__aa = 'auxiliar__cu.txt'
-        self.__acl = 'clientes.txt'
+        self.__aa = 'auxiliar_cu.txt'
 
     def __no_cuenta(self):
         nc = 1
@@ -38,8 +37,8 @@ class Cuentas:
             pickle.dump(obc, oba)
         return nc
 
-    def cuenta_nc(self, nc):
-        ban = True
+    def cuentas_nc(self, nc):
+        """Verifica si una cuenta existe y está activa"""
         try:
             with open(self.__ac, 'rb') as oba:
                 try:
@@ -47,16 +46,13 @@ class Cuentas:
                         obc = pickle.load(oba)
                         if obc.nc() == nc:
                             if obc.act():
-                                ban = False
                                 return nc
                             else:
-                                return 0
+                                return -1  # Cuenta inactiva
                 except EOFError:
-                    if ban:
-                        print('No hay cuenta con ese numero...')
-                        return 0
+                    return 0  # Cuenta no encontrada
         except FileNotFoundError:
-            print('No hay cuentas registrados...')
+            return 0
 
     def lista(self):
         ban = True
@@ -72,11 +68,9 @@ class Cuentas:
                             obc.mostrar()
                 except EOFError:
                     if ban:
-                        print('No hay clientes registrados...')
-                    else:
-                        print('Fin del archivo...')
+                        print('No hay cuentas activas...')
         except FileNotFoundError:
-            print('No hay clientes registrados...')
+            print('No hay cuentas registradas...')
 
     def buscar_nc(self):
         try:
@@ -91,13 +85,18 @@ class Cuentas:
                                 obc.títulos()
                                 obc.mostrar()
                                 return nc
+                            else:
+                                print('La cuenta está inactiva')
+                                return 0
                 except EOFError:
-                    print('No hay cuentas registrados con ese numero...')
+                    print('No hay cuentas registradas con ese numero...')
+                    return 0
         except FileNotFoundError:
-            print('No hay cuentas registrados...')
+            print('No hay cuentas registradas...')
+            return 0
 
     def buscar_ncl(self, ncl):
-        ban = True
+        """Busca todas las cuentas de un cliente"""
         lista = []
         try:
             with open(self.__ac, 'rb') as oba:
@@ -105,15 +104,11 @@ class Cuentas:
                     while True:
                         obc = pickle.load(oba)
                         if obc.ncl() == ncl:
-                            if obc.act():
-                                lista.append(obc)
-                                ban = False
+                            lista.append(obc)
                 except EOFError:
-                    if ban:
-                        return 0
-                return lista
+                    return lista
         except FileNotFoundError:
-            print('No hay cuentas registrados...')
+            return lista
 
     def bajas(self):
         ban = True
@@ -131,34 +126,35 @@ class Cuentas:
                     if ban:
                         print('No hay cuentas inactivas...')
         except FileNotFoundError:
-            print('No hay cuentas registrados...')
+            print('No hay cuentas registradas...')
 
     def modificar(self):
         ban = True
         try:
-            ncl = Datos().entero('Número de cuenta a modificar')
+            nc = Datos().entero('Número de cuenta a modificar')
             with open(self.__ac, 'rb') as oba, open(self.__aa, 'wb') as obx:
                 try:
                     while True:
                         obc = pickle.load(oba)
-                        if obc.nc() == ncl:
+                        if obc.nc() == nc:
                             if obc.act():
-                                obc.títulos()
                                 ban = False
-                                obc.mostrar()
                                 obc.modificar()
                         pickle.dump(obc, obx)
                 except EOFError:
                     if ban:
-                        print(
-                            'No hay clientes registrados con ese numero...')
+                        print('No hay cuentas registradas con ese numero...')
             if not ban:
+                print('Cuenta modificada correctamente.')
                 self.__actualizar()
         except FileNotFoundError:
-            print('No hay clientes registrados...')
+            print('No hay cuentas registradas...')
 
     def modificar_monto(self, nc, tip, mon):
+        """Modifica el saldo de una cuenta según el tipo de movimiento"""
         ban = True
+        ver = 0
+        ncl = 0
         try:
             with open(self.__ac, 'rb') as oba, open(self.__aa, 'wb') as obx:
                 try:
@@ -170,9 +166,10 @@ class Cuentas:
                         pickle.dump(obc, obx)
                 except EOFError:
                     if ban:
-                        print('No hay movimientos registrados...')
+                        print('No se encontró la cuenta...')
             if not ban:
                 self.__actualizar()
-                return ver, ncl
+            return ver, ncl
         except FileNotFoundError:
-            print('No hay clientes registrados...')
+            print('No hay cuentas registradas...')
+            return 0, 0
