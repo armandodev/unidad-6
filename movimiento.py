@@ -43,3 +43,6 @@ class Movimiento:
 
     def monto(self):
         return self.__mon
+
+    def inactivo(self):
+        self.__act = 0

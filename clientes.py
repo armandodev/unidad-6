@@ -1,10 +1,12 @@
 from cliente import Cliente
 from cuentas import Cuentas
+from movimientos import Movimientos
 from poo.lib import Datos
 import pickle
 
 
 class Clientes(Cuentas):
+
     def __init__(self):
         super().__init__()
         self.__ac = 'clientes.txt'
@@ -32,17 +34,23 @@ class Clientes(Cuentas):
                 pass
 
     def nuevo(self):
-        obc = Cliente()
+        # Get a new client number
         ncl = self.__no_cliente()
+        # Create a new client
+        obc = Cliente()
         obc.nuevo(ncl)
-        super().nueva_cuenta(ncl)
-        obc.nuevo_cuenta()
-        ina = super().nuevo_movimiento()
-        obc.movimiento(ina)
+        # Save client to file
         with open(self.__ac, 'ab') as oba:
             pickle.dump(obc, oba)
-
-    def lista(self):
+        # Create a new account for the client
+        self.nueva_cuenta(ncl)
+        # Get the account number
+        nc = Datos().entero('Ingresa el numero de la cuenta')
+        # Create movement for the account
+        ina = self.nuevo_movimiento(nc)
+        # Update client with movement info
+        if ina is not None:
+            obc.movimiento(ina)
         ban = True
         try:
             with open(self.__ac, 'rb') as oba:
@@ -114,6 +122,9 @@ class Clientes(Cuentas):
         ban = True
         try:
             ncl = Datos().entero('Dame el numero de cliente a eliminar')
+            if self.tiene_cuentas_activas(ncl):
+                print("¡Cliente tiene cuentas activas! No se puede borrar")
+                return
             with open(self.__ac, 'rb') as oba, open(self.__aa, 'wb') as obx:
                 try:
                     while True:

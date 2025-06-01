@@ -1,16 +1,12 @@
-from movimientos import Movimientos
 from cuenta import Cuenta
 from poo.lib import Datos
 import pickle
 
 
-class Cuentas(Movimientos):
-    obd = Datos()
-
+class Cuentas:
     def __init__(self):
-        super().__init__()
         self.__ac = 'cuentas.txt'
-        self.__aa = 'auxiliar.txt'
+        self.__aa = 'auxiliar_cue.txt'
 
     def __no_cuenta(self):
         nc = 1
@@ -25,7 +21,7 @@ class Cuentas(Movimientos):
             return nc
 
     def __actualizar(self):
-        with open(self.__ac, 'wb') as oba, open(super().__aa, 'rb') as obx:
+        with open(self.__ac, 'wb') as oba, open(self.__aa, 'rb') as obx:
             try:
                 while True:
                     obc = pickle.load(obx)
@@ -42,7 +38,7 @@ class Cuentas(Movimientos):
 
     def nuevo_movimiento(self, nc=None):
         if not nc:
-            nc = self.obd.entero('Ingresa el numero de la cuenta')
+            nc = Datos().entero('Ingresa el numero de la cuenta')
         ban = True
         try:
             with open(self.__ac, 'rb') as oba:
@@ -59,7 +55,13 @@ class Cuentas(Movimientos):
         if ban:
             print("No existe la cuenta indicada...")
             return None
-        tip, mon = super().nuevo(nc)
+        # Create a new movement
+        print("\n<<DATOS DEL MOVIMIENTO>>")
+        print("Tipo de movimiento")
+        print("1) Deposito")
+        print("2) Retiro")
+        tip = Datos().entero("Selecciona una opción")
+        mon = Datos().real("Monto")
         try:
             with open(self.__ac, 'rb') as oba, open(self.__aa, 'wb') as obx:
                 try:
@@ -177,7 +179,7 @@ class Cuentas(Movimientos):
         ban = True
         try:
             ncl = Datos().entero('Dame el numero de la cuenta a Modificar')
-            with open(self.__ac, 'rb') as oba, open(super().__aa, 'wb') as obx:
+            with open(self.__ac, 'rb') as oba, open(self.__aa, 'wb') as obx:
                 try:
                     while True:
                         obc = pickle.load(oba)
@@ -201,7 +203,7 @@ class Cuentas(Movimientos):
     def modificar_monto(self, nc, tip, mon):
         ban = True
         try:
-            with open(self.__ac, 'rb') as oba, open(super().__aa, 'wb') as obx:
+            with open(self.__ac, 'rb') as oba, open(self.__aa, 'wb') as obx:
                 try:
                     while True:
                         obc = pickle.load(oba)
@@ -219,3 +221,30 @@ class Cuentas(Movimientos):
                 self.__actualizar()
         except FileNotFoundError:
             print('No hay clientes registrados...')
+
+    def tiene_cuentas_activas(self, ncl):
+        try:
+            with open(self.__ac, 'rb') as oba:
+                while True:
+                    try:
+                        cuenta = pickle.load(oba)
+                        if cuenta.ncl() == ncl and cuenta.act():
+                            return True
+                    except EOFError:
+                        return False
+        except FileNotFoundError:
+            return False
+
+    def ajustar_saldo(self, nc, mon, tip):
+        try:
+            with open(self.__ac, 'rb') as oba, open(self.__aa, 'wb') as obx:
+                try:
+                    while True:
+                        obc = pickle.load(oba)
+                        if obc.nc() == nc:
+                            obc.movimiento(mon, tip)
+                        pickle.dump(obc, obx)
+                except EOFError:
+                    pass
+        except FileNotFoundError:
+            print('No hay cuentas registrados...')

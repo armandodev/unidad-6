@@ -9,8 +9,10 @@ def main():
     ob_cu = Cuentas()
     ob_mv = Movimientos()
     obm = Menu("BANCO", ["CLIENTES", "CUENTAS", "MOVIMIENTOS"])
-    obm_cl = Menu("CLIENTES", ["NUEVO", "LISTA", "BUSCAR", "MODIFICAR", "BORRAR", "BAJAS"])
-    obm_cu = Menu("CUENTAS", ["NUEVA", "LISTA", "BUSCAR", "MODIFICAR", "BAJAS"])
+    obm_cl = Menu("CLIENTES", ["NUEVO", "LISTA",
+                  "BUSCAR", "MODIFICAR", "BORRAR", "BAJAS"])
+    obm_cu = Menu("CUENTAS", ["NUEVA", "LISTA",
+                  "BUSCAR", "MODIFICAR", "BAJAS"])
     obm_mv = Menu("MOVIMIENTOS", ["NUEVO", "CANCELAR"])
     op = 0
     while op != obm.salir():
@@ -52,7 +54,10 @@ def main():
                         case 1:
                             ob_mv.nuevo()
                         case 2:
-                            ob_mv.cancelar()
+                            res = ob_mv.cancelar()
+                            if res:
+                                nc, mon, tip = res
+                                ob_cu.ajustar_saldo(nc, mon, tip)
 
 
 if __name__ == "__main__":
