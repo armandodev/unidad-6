@@ -3,7 +3,6 @@ from cuentas import Cuentas
 from movimientos import Movimientos
 from poo.lib import Datos
 import pickle
-import os
 
 
 class Clientes:
@@ -38,18 +37,10 @@ class Clientes:
         obm = Movimientos()
         ncl = self.__no_cliente()
         obc.nuevo(ncl)
-
-        # Guardar cliente
         with open(self.__ac, 'ab') as oba:
             pickle.dump(obc, oba)
-
-        # Crear cuenta inicial
         nc = obd.nueva(ncl)
-
-        # Actualizar contador de cuentas del cliente
         self.actualizar_contador_cuentas(ncl, 1)
-
-        # Crear movimiento inicial
         obm.nuevo(nc)
 
     def lista(self):
@@ -155,7 +146,6 @@ class Clientes:
                         ncl = obd.ncl()
                         if obd.act() and ncl == ncl_b:
                             lista = cuentas.buscar_ncl(ncl)
-                            # Verificar que todas las cuentas estén inactivas
                             cuentas_activas = False
                             if lista:
                                 for cuenta in lista:
@@ -218,14 +208,16 @@ class Clientes:
             print('No hay clientes registrados...')
 
     def actualizar_contador_cuentas(self, ncl, incremento):
-        """Actualiza el contador de cuentas de un cliente"""
         try:
             with open(self.__ac, 'rb') as oba, open(self.__aa, 'wb') as obx:
                 try:
                     while True:
                         obc = pickle.load(oba)
                         if obc.ncl() == ncl:
-                            if incremento > 0:
+                            if incremento == -999:
+                                while obc.cantidad_cuentas() > 0:
+                                    obc.decrementar_cuentas()
+                            elif incremento > 0:
                                 obc.incrementar_cuentas()
                             else:
                                 obc.decrementar_cuentas()
@@ -233,5 +225,27 @@ class Clientes:
                 except EOFError:
                     pass
             self.__actualizar()
+        except FileNotFoundError:
+            pass
+
+    def eliminar_cliente_directo(self, ncl):
+        ban = True
+        try:
+            with open(self.__ac, 'rb') as oba, open(self.__aa, 'wb') as obx:
+                try:
+                    while True:
+                        obc = pickle.load(oba)
+                        if obc.ncl() == ncl and obc.act():
+                            obc.inactivo()
+                            while obc.cantidad_cuentas() > 0:
+                                obc.decrementar_cuentas()
+                            ban = False
+                            print(
+                                f"Cliente {ncl} eliminado automáticamente (sin cuentas activas)")
+                        pickle.dump(obc, obx)
+                except EOFError:
+                    pass
+            if not ban:
+                self.__actualizar()
         except FileNotFoundError:
             pass

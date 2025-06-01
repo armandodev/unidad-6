@@ -41,13 +41,15 @@ def main():
                         case 1:
                             ncl = ob_cl.cliente_ncl()
                             if ncl != 0:
-                                ob_cu.nueva(ncl)
+                                nc = ob_cu.nueva(ncl)
+                                ob_cl.actualizar_contador_cuentas(ncl, 1)
                         case 2:
                             ob_cu.lista()
                         case 3:
                             nc = ob_cu.buscar_nc()
-                            print('<<MOVIMIENTOS>>')
-                            ob_mv.mostrar(nc)
+                            if nc > 0:
+                                print('<<MOVIMIENTOS>>')
+                                ob_mv.mostrar(nc)
                         case 4:
                             ob_cu.modificar()
                         case 5:
@@ -63,10 +65,18 @@ def main():
                             if nc <= 0:
                                 print('La cuenta esta inactiva o no existe')
                             else:
-                                ob_mv.nuevo(nc)
+                                ver, ncl = ob_mv.nuevo(nc)
+                                if ver == 2:
+                                    ob_cl.eliminar_cliente_directo(ncl)
+                                    ob_cl.actualizar_contador_cuentas(
+                                        ncl, -999)
                         case 2:
                             ver, ncl = ob_mv.cancelar()
-                            ob_cl.modificar_estado(ver, ncl)
+                            if ver == 1:
+                                ob_cl.modificar_estado(ver, ncl)
+                            elif ver == 2:
+                                ob_cl.eliminar_cliente_directo(ncl)
+                                ob_cl.actualizar_contador_cuentas(ncl, -999)
 
 
 if __name__ == "__main__":

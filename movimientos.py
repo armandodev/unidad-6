@@ -42,15 +42,19 @@ class Movimientos:
         monto = obm.monto()
 
         # Verificar el saldo antes de realizar el movimiento
-        ver, _ = self.__cuentas.modificar_monto(nc, tip, monto)
+        ver, ncl = self.__cuentas.modificar_monto(nc, tip, monto)
 
-        if ver:
+        if ver >= 1:
             # Solo guardar el movimiento si fue exitoso
             with open(self.__am, 'ab') as oba:
                 pickle.dump(obm, oba)
             print("Movimiento realizado exitosamente")
+
+            # Retornar información sobre si debe eliminar cliente
+            return ver, ncl
         else:
             print("Movimiento cancelado: saldo insuficiente")
+            return 0, 0
 
     def mostrar(self, nc):
         ban = True
@@ -61,7 +65,7 @@ class Movimientos:
                         obc = pickle.load(oba)
                         if obc.nc() == nc:
                             if ban:
-                                obc.titulos()
+                                obc.títulos()
                                 ban = False
                             obc.mostrar()
                 except EOFError:
@@ -96,7 +100,7 @@ class Movimientos:
                             ver, ncl = self.__cuentas.modificar_monto(
                                 nc, tip, monto)
 
-                            if ver:
+                            if ver > 0:
                                 obc.inactivo()
                                 ban = False
                                 print("Movimiento cancelado exitosamente")

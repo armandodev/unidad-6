@@ -26,7 +26,7 @@ class Cuenta:
 
     def mostrar(self):
         obf = Formato()
-        print(f"| {obf.izq(self.__nc, 3)} | {obf.cen(self.__nm, 30)} | {obf.der(self.__suc, 3)} | {obf.izq(self.__fa, 12)} | {obf.der(self.__sal, 15)} | {obf.cen('ACTIVO' if self.__act else 'INACTIVO', 10)} | {obf.izq(self.__ncl, 3)} |")
+        print(f"| {obf.izq(self.__nc, 3)} | {obf.cen(self.__nm, 30)} | {obf.der(self.__suc, 3)} | {obf.izq(self.__fa, 12)} | {obf.der(obf.mon(self.__sal), 15)} | {obf.cen('ACTIVO' if self.__act else 'INACTIVO', 10)} | {obf.izq(self.__ncl, 3)} |")
 
     def saldo(self, mon, tip):
         sal = self.__sal
@@ -36,10 +36,9 @@ class Cuenta:
         if sal == 0:
             self.__act = 0
             self.__sal = sal
-            return 1, 0
+            return 1, self.__ncl
         elif sal < 0:
-            print('No se realizo la operación')
-            self.__sal = 0
+            print('No se realizó la operación por saldo insuficiente')
             return 0, 0
         else:
             self.__act = 1

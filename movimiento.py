@@ -21,13 +21,13 @@ class Movimiento:
         self.__nc = nc
         print(f"No. cuenta: {nc}")
 
-    def titulos(self):
+    def títulos(self):
         obf = Formato()
         print(f"| {obf.izq('NO.', 5)} | {obf.cen('FECHA', 10)} | {obf.der('TIPO', 10)} | {obf.izq('MONTO', 10)} | {obf.der('ESTADO', 10)} |")
 
     def mostrar(self):
         obf = Formato()
-        print(f"| {obf.izq(self.__nm, 5)} | {obf.cen(self.__fec, 10)} | {obf.der('DEPOSITO' if not self.__tip else 'RETIRO', 10)} | {obf.izq(self.__mon, 10)} | {obf.der('ACTIVO' if self.__act else 'CANCELADO', 10)} |")
+        print(f"| {obf.izq(self.__nm, 5)} | {obf.cen(self.__fec, 10)} | {obf.der('DEPOSITO' if not self.__tip else 'RETIRO', 10)} | {obf.izq(obf.mon(self.__mon), 10)} | {obf.der('ACTIVO' if self.__act else 'CANCELADO', 10)} |")
 
     def nc(self):
         return self.__nc
