@@ -57,3 +57,11 @@ class Lanzadora:
     def rfc(self, ap_p, ap_m, nm, fec_nac):
         dia, mes, año = fec_nac.split('/')
         return f"{ap_p[:2]}{ap_m[0]}{nm[0]}{año[2:]}{mes}{dia}XXX"
+
+    def sexo(self):
+        sexo = ['M', 'F']
+        while True:
+            self.__sexo = self.obd.caracter("Sexo (M/F)").upper()
+            if self.__sexo in sexo:
+                break
+        return self.__sexo
