@@ -5,12 +5,10 @@ from poo.lib import Datos
 import pickle
 
 
-class Clientes(Cuentas):
-
+class Clientes:
     def __init__(self):
-        super().__init__()
         self.__ac = 'clientes.txt'
-        self.__aa = 'auxiliar.txt'
+        self.__aa = 'auxiliar_cl.txt'
 
     def __no_cliente(self):
         ncl = 1
@@ -34,23 +32,17 @@ class Clientes(Cuentas):
                 pass
 
     def nuevo(self):
-        # Get a new client number
-        ncl = self.__no_cliente()
-        # Create a new client
         obc = Cliente()
+        obd = Cuentas()
+        obm = Movimientos()
+        ncl = self.__no_cliente()
         obc.nuevo(ncl)
-        # Save client to file
         with open(self.__ac, 'ab') as oba:
             pickle.dump(obc, oba)
-        # Create a new account for the client
-        self.nueva_cuenta(ncl)
-        # Get the account number
-        nc = Datos().entero('Ingresa el numero de la cuenta')
-        # Create movement for the account
-        ina = self.nuevo_movimiento(nc)
-        # Update client with movement info
-        if ina is not None:
-            obc.movimiento(ina)
+        nc = obd.nueva(ncl)
+        obm.nuevo(nc)
+
+    def lista(self):
         ban = True
         try:
             with open(self.__ac, 'rb') as oba:
@@ -83,10 +75,13 @@ class Clientes(Cuentas):
                                 print("<<CLIENTE>>")
                                 obd.títulos()
                                 obd.mostrar()
-                                print("<<CUENTAS>>")
-                                nc = obc.buscar_ncl(ncl)
-                                print("<<MOVIMIENTOS>>")
-                                obm.mostrar(nc)
+                                lista = obc.buscar_ncl(ncl)
+                                for i in lista:
+                                    print("<<CUENTAS>>")
+                                    i.títulos()
+                                    i.mostrar()
+                                    print("<<MOVIMIENTOS>>")
+                                    obm.mostrar(i.nc())
                                 ban = False
                 except EOFError:
                     if ban:
@@ -97,7 +92,7 @@ class Clientes(Cuentas):
     def modificar(self):
         ban = True
         try:
-            ncl = Datos().entero('Dame el numero de cliente a modificar')
+            ncl = Datos().entero('Número de cliente a modificar')
             with open(self.__ac, 'rb') as oba, open(self.__aa, 'wb') as obx:
                 try:
                     while True:
@@ -120,21 +115,44 @@ class Clientes(Cuentas):
 
     def borrar(self):
         ban = True
+        cuentas = Cuentas()
         try:
-            ncl = Datos().entero('Dame el numero de cliente a eliminar')
-            if self.tiene_cuentas_activas(ncl):
-                print("¡Cliente tiene cuentas activas! No se puede borrar")
-                return
+            ncl_b = Datos().entero('Número de cliente a eliminar')
+            with open(self.__ac, 'rb') as oba, open(self.__aa, 'wb') as obx:
+                try:
+                    while True:
+                        obd = pickle.load(oba)
+                        ncl = obd.ncl()
+                        if obd.act() and ncl == ncl_b:
+                            lista = cuentas.buscar_ncl(ncl)
+                            if not lista:
+                                obd.inactivo()
+                                print(f"Se ha eliminado el cliente correctamente")
+                                ban = False
+                            else:
+                                print(
+                                    f"No se puede eliminar el cliente {ncl} porque tiene cuentas asociadas.")
+                        pickle.dump(obd, obx)
+                except EOFError:
+                    pass
+            if not ban:
+                self.__actualizar()
+            else:
+                print('No se ha encontrado el cliente o ya está inactivo.')
+        except FileNotFoundError:
+            print('No hay clientes registrados...')
+
+    def modificar_estado(self, ver, ncl):
+        try:
+            ban = True
             with open(self.__ac, 'rb') as oba, open(self.__aa, 'wb') as obx:
                 try:
                     while True:
                         obc = pickle.load(oba)
                         if obc.ncl() == ncl:
-                            if obc.act():
-                                obc.títulos()
-                                obc.mostrar()
-                                obc.act_des()
+                            if ver:
                                 ban = False
+                                obc.activo()
                         pickle.dump(obc, obx)
                 except EOFError:
                     pass
@@ -157,6 +175,6 @@ class Clientes(Cuentas):
                             obc.mostrar()
                 except EOFError:
                     if ban:
-                        print('No hay clientes activos...')
+                        print('No hay clientes inactivos...')
         except FileNotFoundError:
             print('No hay clientes registrados...')
