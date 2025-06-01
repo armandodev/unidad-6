@@ -60,6 +60,28 @@ class Clientes:
         except FileNotFoundError:
             print('No hay clientes registrados...')
 
+    def cliente_ncl(self):
+        ban = True
+        try:
+            ncl = Datos().entero('Número de cliente')
+            with open(self.__acl, 'rb') as oba:
+                try:
+                    while True:
+                        obc = pickle.load(oba)
+                        nc = obc.ncl()
+                        if nc == ncl:
+                            if obc.act():
+                                return nc
+                            else:
+                                print('Cliente inactivo')
+                                return 0
+                except EOFError:
+                    if ban:
+                        print('No hay clientes registrados con ese numero...')
+                        return 0
+        except FileNotFoundError:
+            print('No hay clientes registrados...')
+
     def buscar(self):
         ban = True
         obc = Cuentas()
