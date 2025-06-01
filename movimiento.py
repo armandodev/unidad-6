@@ -7,7 +7,7 @@ class Movimiento:
     def nuevo(self, nm, nc):
         print(f"\n<<DATOS DEL MOVIMIENTO>>")
         self.__nm = nm
-        print(f"Numero de deposito: {nm}")
+        print(f"Numero de movimiento {nm}")
         self.__fec = FechaHora().fecha()
         self.__tip = -1
         while self.__tip < 0 or self.__tip > 1:
@@ -19,15 +19,15 @@ class Movimiento:
         self.__act = 1
         print("Estado: Activo")
         self.__nc = nc
-        print(f"No. cuentas: {nc}")
+        print(f"No. cuenta: {nc}")
 
-    def títulos(self):
+    def titulos(self):
         obf = Formato()
-        print(f"| {obf.izq('No.', 5)} | {obf.cen('Fecha', 15)} | {obf.der('Tip', 10)} | {obf.izq('Monto', 15)} | {obf.der('Estado', 10)} | {obf.cen('No. cuenta', 15)} |")
+        print(f"| {obf.izq('NO.', 5)} | {obf.cen('FECHA', 10)} | {obf.der('TIPO', 10)} | {obf.izq('MONTO', 10)} | {obf.der('ESTADO', 10)} |")
 
     def mostrar(self):
         obf = Formato()
-        print(f"| {obf.izq(self.__nm, 5)} | {obf.cen(self.__fec, 15)} | {obf.der('Deposito' if not self.__tip else 'Retiro', 10)} | {obf.izq(self.__mon, 15)} | {obf.der('Estado' if self.__act == 1 else 'Inactivo', 10)} | {obf.cen(self.__nc, 15)} |")
+        print(f"| {obf.izq(self.__nm, 5)} | {obf.cen(self.__fec, 10)} | {obf.der('DEPOSITO' if not self.__tip else 'RETIRO', 10)} | {obf.izq(self.__mon, 10)} | {obf.der('ACTIVO' if self.__act else 'CANCELADO', 10)} |")
 
     def nc(self):
         return self.__nc
