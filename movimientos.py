@@ -1,12 +1,16 @@
 from movimiento import Movimiento
+from cuentas import Cuentas
 from poo.lib import Datos
 import pickle
 
 
-class Movimientos:
+class Movimientos(Cuentas):
+    obd = Datos()
+
     def __init__(self):
         self.__am = 'movimientos.txt'
-        self.__aa = 'auxiliar.txt'
+        self.__aa = 'auxiliar__mv.txt'
+        super().__init__()
 
     def __actualizar(self):
         with open(self.__am, 'wb') as oba, open(self.__aa, 'rb') as obx:
@@ -34,7 +38,9 @@ class Movimientos:
         obm.nuevo(self.__no_movimiento(), nc)
         with open(self.__am, 'ab') as oba:
             pickle.dump(obm, oba)
-        return obm.tipo(), obm.monto()
+        tip = obm.tipo()
+        monto = obm.monto()
+        super().modificar_monto(nc, tip, monto)
 
     def mostrar(self, nc):
         ban = True
@@ -45,38 +51,41 @@ class Movimientos:
                         obc = pickle.load(oba)
                         if obc.nc() == nc:
                             if ban:
-                                obc.títulos()
+                                obc.titulos()
                                 ban = False
                             obc.mostrar()
                 except EOFError:
                     if ban:
-                        print('No hay cuentas registrados...')
-                    else:
-                        print('Fin del archivo...')
+                        print('No hay movimientos registrados a esa cuenta...')
         except FileNotFoundError:
-            print('No hay cuentas registrados...')
+            print('No hay movimientos registrados...')
 
     def cancelar(self):
         ban = True
         try:
-            ncm = Datos().entero('Dame el numero del movimiento a cancelar')
+            nm_c = self.obd.entero('Número de movimiento')
             with open(self.__am, 'rb') as oba, open(self.__aa, 'wb') as obx:
                 try:
                     while True:
-                        obm = pickle.load(oba)
-                        if obm.nm() == ncm:
-                            nc = obm.nc()
-                            mon = obm.monto()
+                        obc = pickle.load(oba)
+                        if obc.nm() == nm_c:
+
+                            monto = obc.monto()
+                            obc.inactivo()
+                            nc = obc.nc()
+                            tip = obc.tipo()
                             ban = False
-                            obm.inactivo()
-                        pickle.dump(obm, obx)
+                            if tip == 0:
+                                tip = 1
+                            else:
+                                tip = 0
+                            ver, ncl = super().modificar_monto(nc, tip, monto)
+                        pickle.dump(obc, obx)
                 except EOFError:
                     if ban:
-                        print('No se encontró el movimiento, busca de nuevo...')
+                        print('No se ha encontrado el movimiento...')
             if not ban:
                 self.__actualizar()
-                return nc, mon
-            else:
-                return self.cancelar()
+                return ver, ncl
         except FileNotFoundError:
-            print('No hay cuentas registrados...')
+            print('No hay movimientos registrados...')
