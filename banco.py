@@ -39,7 +39,7 @@ def main():
                 while op_cu != obm_cu.salir():
                     match op_cu := obm_cu.opcion():
                         case 1:
-                            ncl = ob_cu.cliente_ncl()
+                            ncl = ob_cl.cliente_ncl()
                             if ncl != 0:
                                 ob_cu.nueva(ncl)
                         case 2:
